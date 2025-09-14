@@ -7,7 +7,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
-from flask_sqlalchemy import SQLAlchemy
+from flask import SQLAlchemy
 
 # ---------- Flask App Setup ----------
 app = Flask(__name__, template_folder="templates")
@@ -618,6 +618,21 @@ def download_file(c_id):
                 as_attachment=True
             )
     return "No file found", 404
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(100), nullable=False)
+
+class Complaint(db.Model):
+    c_id = db.Column(db.Integer, primary_key=True)
+    category = db.Column(db.String(50))
+    description = db.Column(db.Text)
+    status = db.Column(db.String(20))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
 
 
 # ---------- Run Server ----------
