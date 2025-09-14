@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard</title>
+  <style>
+  body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background: #f5f9ff;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 240px;
+    background: #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    padding: 20px 10px;
+  }
+
+  .logo {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .logo img {
+    width: 60px;
+  }
+  .logo h3 {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 8px 0 0;
+    color: #001858;
+  }
+
+  .menu {
+    margin-top: 20px;
+  }
+  .menu button {
+    width: 90%;
+    padding: 12px;
+    margin: 10px auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #fff;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+  }
+  .menu button:hover {
+    background: #f5f5f5;
+  }
+  .menu .active {
+    background: #f0f4ff;
+    color: #001858;
+    border-left: 6px solid #4169e1;
+  }
+
+  .logout {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    padding: 12px;
+    background: #fff;
+    border: none;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .logout:hover {
+    background: #f5f5f5;
+  }
+
+  /* Main Content */
+  .main {
+    margin-left: 260px;
+    padding: 20px;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  .header h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #001858;
+  }
+  .header button {
+    background: linear-gradient(90deg, #5d9eff, #6b73ff);
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  /* Cards */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  .card h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+    color: #333;
+  }
+  .card p {
+    font-size: 20px;
+    font-weight: bold;
+    color: #001858;
+  }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+     <div class="logo">
+      <img src="https://img.icons8.com/external-flaticons-lineal-color-flat-icons/64/null/external-student-university-flaticons-lineal-color-flat-icons.png" alt="Logo">
+      <h3>Student Panel</h3>
+    </div>
+    <div class="menu">
+      <button class="active">📊 Dashboard</button>
+      <button data-page="complaints">📈 Total Complaint</button>
+      <button data-page="feedback">👍 Feedback</button>
+    </div>
+    <button class="logout" onclick="window.location.href='/'">↩ Logout</button>
+  </div><!-- Main Content -->
+<div class="main">
+  <div class="header">
+    <h2>Student Dashboard</h2>
+  </div>
+<div class="cards" style="grid-template-columns: 1fr; gap: 15px;">
+  <div class="card">
+    <h2>Welcome!</h2>
+  </div>
+  <div class="card">
+    <h3>Track & Fix:</h3>
+    <p>Monitor your complaints and feedback regularly to ensure timely resolution and continuous improvement.</p>
+  </div>
+  <div class="card">
+    <h3>Guidelines:</h3>
+    <p>Submit accurate information, follow up politely, and maintain transparency. Your proactive approach ensures faster resolutions.</p>
+  </div>
+  </div>
+  <script>
+    // Sidebar navigation with active highlight
+    const menuButtons = document.querySelectorAll(".menu button");
+    menuButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        menuButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        if (btn.dataset.page) {
+          window.location.href = "/" + btn.dataset.page;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complaint Summary</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: #fff;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      padding: 20px 10px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      width: 60px;
+    }
+
+    .logo h3 {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 8px 0 0;
+    }
+
+    .menu {
+      margin-top: 20px;
+    }
+
+    .menu button {
+      width: 90%;
+      padding: 12px;
+      margin: 10px auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #fff;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s ease;
+    }
+
+    .menu .active {
+      background: #f0f4ff;
+      color: #001858;
+      border-left: 6px solid #4169e1;
+    }
+
+    .logout {
+      position: absolute;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      padding: 12px;
+      background: #fff;
+      border: none;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* Main Content */
+    .main {
+      margin-left: 260px;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h2 {
+      font-size: 24px;
+      font-weight: bold;
+      color: #001858;
+    }
+
+    .header button {
+      background: linear-gradient(90deg, #5d9eff, #6b73ff);
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* Total Complaint Box */
+    .total-box {
+      background: #fff;
+      border: 2px solid #e63946;
+      text-align: center;
+      margin: 20px 0;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .total-box p {
+      margin: 0;
+      font-weight: bold;
+      color: #c1121f;
+    }
+
+    .total-box h1 {
+      margin: 10px 0 0;
+      font-size: 32px;
+      color: #c1121f;
+    }
+
+    /* Search Bar */
+    .search-box {
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .search-box input {
+      border: none;
+      outline: none;
+      font-size: 14px;
+      margin-left: 10px;
+      flex: 1;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-spacing: 0;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    th {
+      background: #f9f9f9;
+      padding: 15px;
+      text-align: left;
+      font-weight: bold;
+      color: #d90429;
+    }
+
+    td {
+      padding: 15px;
+      border-top: 1px solid #eee;
+      font-weight: bold;
+    }
+
+    /* Status Badges */
+    .status {
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .pending {
+      background: #ff7b00;
+    }
+
+    .process {
+      background: #0077ff;
+    }
+
+    .resolved {
+      background: #1dbf00;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      <img src="https://img.icons8.com/external-flaticons-lineal-color-flat-icons/64/null/external-student-university-flaticons-lineal-color-flat-icons.png" alt="Logo">
+      <h3>Student Panel</h3>
+    </div>
+    <div class="menu">
+      <button >📊 Dashboard</button>
+      <button data-page="complaints" class="active">📈 Total Complaint</button>
+      <button data-page="feedback">👍 Feedback</button>
+    </div>
+    <button class="logout" onclick="window.location.href='/'">↩ Logout</button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <div class="header">
+  <h2>Complaint Summary</h2>
+  <button onclick="window.location.href='/submit_complaint'">Submit New Complaint</button>
+</div>
+
+    <div class="total-box">
+      <p>Total Complaint</p>
+      <h1 id="totalCount">{{ complaints|length }}</h1>
+    </div>
+
+    <div class="search-box">
+      🔍 <input type="text" id="searchInput" placeholder="Search Complaint">
+    </div>
+
+    <table id="complaintTable">
+      <thead>
+        <tr>
+          <th>Complaint ID</th>
+          <th>Complaint Category</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in complaints %}
+        <tr>
+          <td>{{ c[0] }}</td>
+          <td>{{ c[1] }}</td>
+          <td>
+            <span class="status
+              {% if c[2] == 'pending' %}pending{% elif c[2] == 'process' %}process{% elif c[2] == 'resolved' %}resolved{% endif %}">
+              {{ c[2].capitalize() }}
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Sidebar navigation with active highlight
+    const menuButtons = document.querySelectorAll(".menu button");
+    menuButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        menuButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        window.location.href = "/" + btn.dataset.page;
+      });
+    });
+
+    // Search filter
+    const searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("keyup", function() {
+      const filter = searchInput.value.toLowerCase();
+      const rows = document.querySelectorAll("#complaintTable tbody tr");
+      rows.forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(filter) ? "" : "none";
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    .container { display: flex; height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 250px; background: #fff; border-right: 1px solid #ddd; padding: 20px; box-sizing: border-box; }
+    .logo { text-align: center; margin-bottom: 20px; }
+    .logo img { width: 80px; }
+    .logo h2 { font-size: 16px; margin: 10px 0 0; font-weight: bold; }
+    .menu { margin-top: 30px; }
+    .menu-item { display: flex; align-items: center; font-size: 16px; padding: 12px 15px; margin: 8px 0; background: #fff; border-radius: 8px; box-shadow: 2px 2px 6px rgba(0,0,0,0.1); cursor: pointer; }
+    .menu-item.active { background: #4b67f3; color: #fff; }
+    .menu-item i { margin-right: 10px; }
+    .logout { position: absolute; bottom: 20px; left: 30px; font-weight: bold; cursor: pointer; display: flex; align-items: center; }
+    .logout i { margin-right: 10px; }
+
+    /* Main */
+    .main { flex: 1; display: flex; justify-content: center; align-items: center; background: #f5f9ff; }
+    .feedback-box { background: #eaf3ff; padding: 30px; border-radius: 12px; width: 500px; text-align: center; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); }
+    .feedback-box h2 { margin: 0 0 10px; background: linear-gradient(90deg, #f5b942, #f3d96b); display: inline-block; padding: 10px 40px; border-radius: 6px; color: #444; font-size: 20px; }
+    .feedback-box p { margin: 10px 0; color: #555; font-size: 14px; }
+    .feedback-box h3 { margin: 15px 0; font-size: 18px; font-weight: bold; }
+    .stars { margin: 15px 0; }
+    .star { font-size: 32px; color: #ccc; cursor: pointer; margin: 0 5px; }
+    .star.active { color: gold; }
+    textarea { width: 100%; height: 120px; border-radius: 6px; border: 1px solid #ccc; padding: 10px; margin: 15px 0; font-size: 14px; resize: none; }
+    button { background: linear-gradient(90deg, #f5b942, #f3d96b); border: none; padding: 12px 40px; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; color: #4a2600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <img src="https://i.ibb.co/nQWDhZk/logo.png" alt="Logo">
+        <h2>Student Panel</h2>
+      </div>
+      <div class="menu">
+          <button class="menu-item">📊 Dashboard</button>
+        <div class="menu-item"><i>📈</i> Total Complaint</div>
+        <div class="menu-item active" class="active"><i>👍</i> Feedback</div>
+      </div>
+      <div class="logout"><i>↪</i> Logout</div>
+    </div>
+
+    <!-- Feedback Form -->
+    <div class="main">
+      <div class="feedback-box">
+        <h2>Rate us!</h2>
+        <p>We would like your feedback to improve our website!</p>
+        <h3>How would you rate our website?</h3>
+
+        <form id="feedbackForm">
+          <input type="hidden" name="complaint_id" id="complaint_id"  value="{{ last_complaint_id }}">
+          <div class="stars">
+            <span class="star" data-value="1">&#9733;</span>
+            <span class="star" data-value="2">&#9733;</span>
+            <span class="star" data-value="3">&#9733;</span>
+            <span class="star" data-value="4">&#9733;</span>
+            <span class="star" data-value="5">&#9733;</span>
+          </div>
+          <input type="hidden" name="rating" id="ratingInput">
+          <textarea name="description" placeholder="Share your feedback..."></textarea>
+          <br>
+          <button type="submit">Submit Review</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const stars = document.querySelectorAll(".star");
+    const ratingInput = document.getElementById("ratingInput");
+
+    // Star rating
+    stars.forEach((star, index) => {
+      star.addEventListener("click", () => {
+        stars.forEach((s, i) => s.classList.toggle("active", i <= index));
+        ratingInput.value = index + 1;
+      });
+    });
+
+    // Feedback form submit
+    document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+
+      if (formData.has("complaint_id")) {
+        formData.set("complaint_id", parseInt(formData.get("complaint_id")));
+      }
+
+      try {
+        const response = await fetch("/api/feedback", {
+          method: "POST",
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+          alert(result.message);
+          ratingInput.value = "";
+          document.querySelector("textarea").value = "";
+          stars.forEach(s => s.classList.remove("active"));
+        } else {
+          alert(result.message);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Something went wrong while submitting feedback.");
+      }
+    });
+
+    // Sidebar navigation
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        menuItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        if(item.textContent.includes("Dashboard")) window.location.href = "/student_dashboard";
+        else if(item.textContent.includes("Total Complaint")) window.location.href = "/complaints";
+        else if(item.textContent.includes("Feedback")) window.location.href = "/feedback";
+      });
+    });
+  </script>
+</body>
+</html>

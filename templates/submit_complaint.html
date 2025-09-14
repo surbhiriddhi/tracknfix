@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Submit Complaint</title>
+<style>
+body {margin:0;font-family:'Arial',sans-serif;background:#fff;}
+.sidebar{width:240px;background:#fff;position:fixed;top:0;left:0;height:100%;box-shadow:2px 0 8px rgba(0,0,0,0.1);padding:20px 10px;}
+.logo{text-align:center;margin-bottom:20px;}
+.logo img{width:60px;}
+.logo h3{font-size:16px;font-weight:bold;margin:8px 0 0;}
+.menu{margin-top:20px;}
+.menu button{width:90%;padding:12px;margin:10px auto;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:bold;border:none;border-radius:6px;cursor:pointer;background:#fff;box-shadow:0px 2px 5px rgba(0,0,0,0.15);}
+.menu .active{background:#f0f4ff;color:#001858;border-left:6px solid #4169e1;}
+.logout{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:90%;padding:12px;background:#fff;border:none;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0px 2px 5px rgba(0,0,0,0.15);border-radius:6px;cursor:pointer;}
+.main{margin-left:260px;padding:20px;}
+.form-container{background:#f0f6ff;padding:30px;border-radius:10px;max-width:600px;margin:auto;box-shadow:0px 2px 8px rgba(0,0,0,0.1);}
+.form-container h2{text-align:center;background:linear-gradient(90deg,#5d9eff,#6b73ff);color:#fff;padding:12px;border-radius:6px;font-size:18px;margin-bottom:20px;}
+.form-container label{display:block;font-weight:bold;margin:10px 0 6px;}
+.form-container select, .form-container textarea{width:100%;padding:12px;border-radius:6px;border:1px solid #ccc;font-size:14px;margin-bottom:15px;}
+.form-container textarea{resize:none;}
+.file-upload{margin:10px 0;}
+.file-upload input{padding:6px;}
+.file-note{font-size:12px;color:#333;margin-top:4px;}
+.submit-btn{display:block;width:100%;background:#00c400;color:#fff;padding:12px;border:none;border-radius:6px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:10px;}
+.submit-btn:hover{background:#009e00;}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="logo">
+    <img src="https://img.icons8.com/external-flaticons-lineal-color-flat-icons/64/null/external-student-university-flaticons-lineal-color-flat-icons.png" alt="Logo">
+    <h3>Student Panel</h3>
+  </div>
+  <div class="menu">
+    <button >📊 Dashboard</button>
+    <button class="active">📈 Total Complaint</button>
+    <button >👍 Feedback</button>
+  </div>
+  <button class="logout">↩ Logout</button>
+</div>
+
+<div class="main">
+  <div class="form-container">
+    <h2>Submit New Complaint</h2>
+<form id="complaintForm" action="/upload" method="POST" enctype="multipart/form-data">
+  
+  <label for="category">Complaint Category</label>
+  <select id="category" name="category" required>
+    <option value="">-- Select Category --</option>
+    <option value="Academic">Academic</option>
+    <option value="Infrastructure">Infrastructure</option>
+    <option value="Disciplinary / Safety">Disciplinary / Safety</option>
+    <option value="Other">Other</option>
+  </select>
+
+  <label for="description">Description</label>
+  <textarea id="description" name="description" rows="4" placeholder="Please provide a detailed description..." required></textarea>
+
+  <label for="file">Upload File (optional)</label>
+   <div class="file-upload">
+    <input type="file" id="file" name="file">
+    <div class="file-note">Max file size: 10 MB</div>
+  </div>
+
+  <button type="submit" class="submit-btn">Submit</button>
+</form>
+
+  </div>
+</div>
+
+<script>
+document.getElementById("complaintForm").addEventListener("submit", async function(event) {
+  event.preventDefault();
+  let formData = new FormData(this);
+
+  try {
+    const response = await fetch("/submit_complaint", {
+      method: "POST",
+      body: formData
+    });
+    const result = await response.json();
+
+   if (result.status === "success") {
+    alert("Complaint submitted successfully! Redirecting...");
+    window.location.href = "/student_tracking"; 
+}
+ else {
+            alert(result.message);
+        }
+  } catch(err){
+    console.error(err);
+    alert("Error submitting complaint.");
+  }
+});
+</script>
+</body>
+</html>

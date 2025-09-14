@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resolved Complaints</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:"Segoe UI", sans-serif; }
+    body { display:flex; background:#f8fafc; color:#333; }
+
+    /* Sidebar */
+    .sidebar { width:220px; background:#0b214a; color:#fff; padding:20px; height:100vh; }
+    .sidebar h2 { margin-bottom:20px; }
+    .sidebar ul { list-style:none; }
+    .sidebar ul li { padding:12px; border-radius:6px; cursor:pointer; }
+    .sidebar ul li:hover, .sidebar ul li.active { background:#5a4ff3; }
+
+    /* Main */
+    .main { flex:1; padding:20px; }
+    header { display:flex; justify-content:space-between; align-items:center; }
+    .profile { display:flex; align-items:center; gap:10px; }
+    .profile .user { background:#5a4ff3; color:#fff; font-weight:bold; border-radius:50%; padding:10px 14px; }
+
+    /* Filters */
+    .filters { margin:20px 0; display:flex; gap:10px; }
+    .filters input, .filters select { padding:8px 12px; border:1px solid #ccc; border-radius:6px; }
+
+    /* Table */
+    table { width:100%; border-collapse:collapse; background:#fff; box-shadow:0 3px 6px rgba(0,0,0,0.1); border-radius:6px; overflow:hidden; }
+    thead { background:#f1f3f7; }
+    th, td { padding:12px; text-align:left; border-bottom:1px solid #eee; }
+
+    .badge { padding:4px 8px; border-radius:12px; font-size:12px; color:#fff; }
+    .badge.infrastructure { background:#4e73df; }
+    .badge.academics { background:#36b9cc; }
+    .badge.security { background:#e74a3b; }
+    .badge.cafeteria { background:#f6c23e; color:#000; }
+
+   .notify-btn {
+  background: #28a745;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+.notify-btn:hover {
+  background: #218838;
+  transform: scale(1.05);
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2>Admin Panel</h2>
+    <ul>
+      <li>Dashboard</li>
+      <li>Pending</li>
+      <li>In Process</li>
+      <li class="active">Resolved</li>
+      <li>Log Out</li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <header>
+      <div><h1>Resolved Complaints</h1></div>
+      <div class="profile">
+      <span class="user">AD</span>
+      <div>
+        <strong>ADMIN01</strong><br>
+        <small>admin01@example.com</small>
+      </div>
+    </div>
+    </header>
+
+    <!-- Filters -->
+    <div class="filters">
+      <input type="text" placeholder="Search complaints, ID, or submitter...">
+      <select>
+        <option>All Categories</option>
+        <option>Academics</option>
+        <option>Infrastructure</option>
+        <option>Security</option>
+        <option>Cafeteria</option>
+      </select>
+    </div>
+
+    <!-- Complaints Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Assigned To</th>
+          <th>Resolved Date</th>
+          <th>Notify</th>
+        </tr>
+      </thead>
+      <tbody>
+       <tbody>
+  {% for c in complaints %}
+  <tr data-id="{{ c.c_id }}">
+    <td>{{ c.c_id }}</td>
+    <td>{{ c.description }}</td>
+    <td>
+<span class="badge {{ c.category.lower() }}">{{ c.category }}</span>
+    </td>
+    <td>{{ c.assigned_to }}</td>
+    <td>{{ c.resolved_at.strftime("%Y-%m-%d %H:%M") if c.resolved_at else "-" }}</td>
+    <td>
+      <button class="notify-btn" data-id="{{ c.c_id }}">Notify</button>
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+    // Sidebar navigation
+    document.querySelectorAll(".sidebar ul li").forEach(item => {
+      item.addEventListener("click", () => {
+        const page = item.textContent.trim();
+        if(page === "Dashboard") window.location.href="/admin_dashboard";
+        else if(page === "Pending") window.location.href="/pending";
+        else if(page === "In Process") window.location.href="/inprocess";
+        else if(page === "Resolved") window.location.href="/resolved";
+        else if(page === "Log Out") window.location.href="/";
+      });
+    });
+   // Dropdown category filter
+const categoryFilter = document.querySelector("select");
+categoryFilter.addEventListener("change", function() {
+  const selected = this.value.toLowerCase();
+  document.querySelectorAll("tbody tr").forEach(row => {
+    const rowCategory = row.querySelector(".badge").innerText.toLowerCase();
+    // Show row if matches selected or if "All Categories" is selected
+    row.style.display = (selected === "all categories" || rowCategory === selected) ? "" : "none";
+  });
+});
+
+    // Search filter
+    document.querySelector("input[type='text']").addEventListener("input", function () {
+      let filter = this.value.toLowerCase();
+      document.querySelectorAll("tbody tr").forEach(row => {
+        let text = row.innerText.toLowerCase();
+        row.style.display = text.includes(filter) ? "" : "none";
+      });
+    });
+
+    // Notify button
+   // Notify button
+document.querySelectorAll(".notify-btn").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const id = btn.dataset.id;
+
+    // Confirm before sending email
+    if(!confirm("Are you sure you want to notify the user?")) return;
+
+    try {
+      const res = await fetch(`/complaint/${id}/notify`, { method: "POST" });
+      const data = await res.json();
+      if (data.status === "success") {
+        alert("✅ User notified successfully!");
+      } else {
+        alert("❌ Error: " + data.msg);
+      }
+    } catch (err) {
+      alert("⚠️ Something went wrong: " + err.message);
+    }
+  });
+});
+
+  </script>
+</body>
+</html>

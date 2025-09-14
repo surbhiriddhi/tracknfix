@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pending Complaints</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", sans-serif; }
+    body { display: flex; background: #f8fafc; color: #333; }
+    /* Sidebar */
+    .sidebar { width: 220px; background: #0b214a; color: #fff; padding: 20px; height: 100vh; }
+    .sidebar h2 { margin-bottom: 20px; }
+    .sidebar ul { list-style: none; }
+    .sidebar ul li { padding: 12px; border-radius: 6px; cursor: pointer; }
+    .sidebar ul li:hover, .sidebar ul li.active { background: #5a4ff3; }
+    /* Main */
+    .main { flex: 1; padding: 20px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .profile { display: flex; align-items: center; gap: 10px; }
+    .profile .user { background: #5a4ff3; color: #fff; font-weight: bold; border-radius: 50%; padding: 10px 14px; }
+    /* Filters */
+    .filters { display: flex; gap: 10px; margin-bottom: 20px; }
+    .filters input, .filters select { padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; }
+    /* Table */
+    table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 3px 6px rgba(0,0,0,0.1); border-radius: 6px; overflow: hidden; }
+    thead { background: #f1f3f7; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+    .badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; color: #fff; }
+    .badge.infra { background: #4e73df; }
+    .badge.academics { background: #36b9cc; }
+    .badge.security { background: #e74a3b; }
+    .badge.cafeteria { background: #f6c23e; color: #000; }
+    .priority { padding: 4px 8px; border-radius: 12px; font-size: 12px; color: #fff; }
+    .priority.medium { background: #f6c23e; color: #000; }
+    .priority.high { background: #e74a3b; }
+    .priority.critical { background: #5a4ff3; }
+    .overdue { color: red; font-weight: bold; }
+    .actions button { padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; }
+    .assign { background: #5a4ff3; color: #fff; }
+    .view { background: #eee; margin-right: 5px; }
+    /* Pagination */
+    .pagination { margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px; }
+    .pagination button { padding: 8px 14px; border: none; background: #5a4ff3; color: #fff; border-radius: 6px; cursor: pointer; }
+    .pagination button:disabled { background: #ccc; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2>Admin Panel</h2>
+    <ul>
+      <li>Dashboard</li>
+      <li class="active">Pending</li>
+      <li>In Process</li>
+      <li>Resolved</li>
+      <li>Log Out</li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <header>
+      <div>
+        <h1>Pending Complaints</h1>
+        <p>List of complaints awaiting review and assignment.</p>
+      </div>
+      <div class="profile">
+      <span class="user">AD</span>
+      <div>
+        <strong>ADMIN01</strong><br>
+        <small>admin01@example.com</small>
+      </div>
+    </div>
+    </header>
+
+    <!-- Filters -->
+    <div class="filters">
+      <input type="text" placeholder="Search complaints, ID, or submitter...">
+      <select>
+        <option>All Categories</option>
+        <option>Academics</option>
+        <option>Infrastructure</option>
+        <option>Security</option>
+        <option>Cafeteria</option>
+      </select>
+      <select>
+        <option>All Priority</option>
+        <option>Critical</option>
+        <option>High</option>
+        <option>Medium</option>
+      </select>
+    </div>
+
+    <!-- Complaints Table -->
+<!-- Complaints Table -->
+<table>
+  <thead>
+    <tr>
+      <th>Complaint ID</th>
+      <th>User ID</th>
+      <th>Category</th>
+      <th>Description</th>
+      <th>File</th>
+      <th>File Type</th>
+      <th>Priority</th>
+      <th>Action</th>
+      <th>Created At</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Rows fetched dynamically from DB -->
+    {% for c in complaints %}
+    <tr data-id="{{ c.c_id }}">
+      <td>{{ c.c_id }}</td>
+      <td>{{ c.user_id }}</td>
+      <td>{{ c.category }}</td>
+      <td>{{ c.description }}</td>
+      <td>
+        {% if c.file_data %}
+          {% if c.file_type.startswith('image') %}
+            <a href="{{ url_for('download_file', c_id=c.c_id) }}" target="_blank">
+              <img src="{{ url_for('download_file', c_id=c.c_id) }}" alt="Photo" style="height:50px;">
+            </a>
+          {% else %}
+            <a href="{{ url_for('download_file', c_id=c.c_id) }}" target="_blank">View/Download</a>
+          {% endif %}
+        {% else %}
+          No file
+        {% endif %}
+      </td>
+      <td>{{ c.file_type }}</td>
+      <td>
+        <select class="priority-select" data-id="{{ c.c_id }}">
+          <option value="Critical" {% if c.priority == 'Critical' %}selected{% endif %}>Critical</option>
+          <option value="High" {% if c.priority == 'High' %}selected{% endif %}>High</option>
+          <option value="Medium" {% if c.priority == 'Medium' %}selected{% endif %}>Medium</option>
+        </select>
+      </td>
+      <td>
+        <button class="assign-btn" data-id="{{ c.c_id }}">Assign</button>
+      </td>
+      <td>{{ c.created_at }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+  
+  </main>
+<script>
+  // Sidebar navigation
+  document.querySelectorAll(".sidebar ul li").forEach(item => {
+    item.addEventListener("click", () => {
+      const page = item.textContent.trim();
+      if (page === "Dashboard") window.location.href = "/admin_dashboard";
+      else if (page === "Pending") window.location.href = "/pending";
+      else if (page === "In Process") window.location.href = "/inprocess";
+      else if (page === "Resolved") window.location.href = "/resolved";
+      else if (page === "Log Out") window.location.href = "/";
+    });
+  });
+
+  // Search filter
+  const searchInput = document.querySelector("input[type='text']");
+  const categorySelect = document.querySelectorAll(".filters select")[0];
+  const prioritySelect = document.querySelectorAll(".filters select")[1];
+  const tableRows = document.querySelectorAll("tbody tr");
+
+  function filterTable() {
+    const searchVal = searchInput.value.toLowerCase();
+    const categoryVal = categorySelect.value.toLowerCase();
+    const priorityVal = prioritySelect.value.toLowerCase();
+
+    tableRows.forEach(row => {
+      const text = row.innerText.toLowerCase();
+      const catText = row.querySelector("td:nth-child(3)")?.innerText.toLowerCase() || "";
+      const prioText = row.querySelector("td:nth-child(7) select")?.value.toLowerCase() || "";
+
+      const categoryMatch = (categoryVal === "all categories") || catText === categoryVal;
+      const priorityMatch = (priorityVal === "all priority") || prioText === priorityVal;
+      const searchMatch = text.includes(searchVal);
+
+      row.style.display = (categoryMatch && priorityMatch && searchMatch) ? "" : "none";
+    });
+  }
+
+  searchInput.addEventListener("input", filterTable);
+  categorySelect.addEventListener("change", filterTable);
+  prioritySelect.addEventListener("change", filterTable);
+
+  // Priority change handler (backend call)
+  document.querySelectorAll(".priority-select").forEach(select => {
+    select.addEventListener("change", async function () {
+      const id = this.dataset.id;
+      const priority = this.value;
+
+      const res = await fetch(`/complaint/${id}/priority`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priority })
+      });
+
+      const data = await res.json();
+      if (data.status === "success") {
+        alert("Priority assigned successfully!");
+      } else {
+        alert("Error: " + data.msg);
+      }
+    });
+  });
+
+  document.querySelectorAll(".assign-btn").forEach(btn => {
+  btn.addEventListener("click", async function () {
+    const id = this.dataset.id;
+    const row = this.closest("tr");
+
+    const res = await fetch(`/complaint/${id}/assign`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({})  // JSON body required for Flask
+    });
+
+    const data = await res.json();
+    if (data.status === "success") {
+      alert("Complaint assigned and moved to In Process!");
+      row.remove(); // remove from pending list
+    } else {
+      alert("Error: " + data.msg);
+    }
+  });
+});
+
+</script>
+
+</body>
+</html>

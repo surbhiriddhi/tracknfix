@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - In Progress Complaints</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", sans-serif; }
+    body { display: flex; background: #f8fafc; color: #333; }
+    /* Sidebar */
+    .sidebar { width: 220px; background: #0b214a; color: #fff; padding: 20px; height: 100vh; }
+    .sidebar h2 { margin-bottom: 20px; }
+    .sidebar ul { list-style: none; }
+    .sidebar ul li { padding: 12px; border-radius: 6px; cursor: pointer; }
+    .sidebar ul li:hover, .sidebar ul li.active { background: #5a4ff3; }
+    /* Main */
+    .main { flex: 1; padding: 20px; }
+    header { display: flex; justify-content: space-between; align-items: center; }
+    .profile { display: flex; align-items: center; gap: 10px; }
+    .profile .user { background: #5a4ff3; color: #fff; font-weight: bold; border-radius: 50%; padding: 10px 14px; }
+    /* Filters */
+    .filters { margin: 20px 0; display: flex; gap: 10px; }
+    .filters input, .filters select { padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; }
+    /* Table */
+    table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 3px 6px rgba(0,0,0,0.1); border-radius: 6px; overflow: hidden; }
+    thead { background: #f1f3f7; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+    .solve-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.solve-btn:hover { background: #218838; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2>Admin Panel</h2>
+    <ul>
+      <li id="dashboard">Dashboard</li>
+      <li id="pending">Pending</li>
+      <li id="inprocess" class="active">In Process</li>
+      <li id="resolved">Resolved</li>
+      <li id="logout">Log Out</li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <header>
+      <div>
+        <h1>In Process Complaints</h1>
+      </div>
+      <div class="profile">
+      <span class="user">AD</span>
+      <div>
+        <strong>ADMIN01</strong><br>
+        <small>admin01@example.com</small>
+      </div>
+    </div>
+    </header>
+
+    <!-- Filters -->
+    <div class="filters">
+      <input id="searchInput" type="text" placeholder="Search complaints, ID, or submitter...">
+      <select id="categorySelect">
+        <option value="">All Categories</option>
+        <option value="hostel">Hostel</option>
+        <option value="academics">Academics</option>
+        <option value="infrastructure">Infrastructure</option>
+        <option value="transport">Transport</option>
+      </select>
+      <select id="assigneeSelect">
+        <option value="">All Assignees</option>
+        <option value="Tom Wilson">Tom Wilson</option>
+        <option value="Lisa Chen">Lisa Chen</option>
+        <option value="Mark Johnson">Mark Johnson</option>
+      </select>
+    </div>
+
+    <!-- Complaints Table -->
+    <table id="complaintsTable">
+      <thead>
+        <tr>
+          <th>Complaint ID</th>
+          <th>Subject</th>
+          <th>Category</th>
+          <th>Assigned To</th>
+        </tr>
+      </thead>
+    <tbody>
+  {% for c in complaints %}
+<tr data-id="{{ c.c_id }}" data-category="{{ c.category }}" data-assignee="{{ c.assigned_to }}">
+  <td>{{ c.c_id }}</td>
+  <td>{{ c.description }}</td>
+  <td>{{ c.category }}</td>
+  <td>{{ c.assigned_to }}</td>
+  <td>
+    <button class="solve-btn" data-id="{{ c.c_id }}">Solved</button>
+  </td>
+</tr>
+
+
+{% endfor %}
+
+
+</tbody>
+
+</table>
+
+ 
+    
+  </main>
+
+  <script>
+    const searchInput = document.getElementById("searchInput");
+    const categorySelect = document.getElementById("categorySelect");
+    const assigneeSelect = document.getElementById("assigneeSelect");
+    const tableRows = Array.from(document.querySelectorAll("#complaintsTable tbody tr"));
+
+    function filterTable() {
+      const searchValue = searchInput.value.toLowerCase();
+      const categoryValue = categorySelect.value.toLowerCase();
+      const assigneeValue = assigneeSelect.value.toLowerCase();
+
+      tableRows.forEach(row => {
+        const textMatch = row.innerText.toLowerCase().includes(searchValue);
+        const categoryMatch = !categoryValue || row.dataset.category.toLowerCase() === categoryValue;
+        const assigneeMatch = !assigneeValue || row.dataset.assignee.toLowerCase() === assigneeValue;
+
+        row.style.display = (textMatch && categoryMatch && assigneeMatch) ? "" : "none";
+      });
+    }
+
+    searchInput.addEventListener("input", filterTable);
+    categorySelect.addEventListener("change", filterTable);
+    assigneeSelect.addEventListener("change", filterTable);
+
+    // Sidebar navigation
+    document.getElementById('dashboard').addEventListener('click', () => { window.location.href = '/admin_dashboard'; });
+    document.getElementById('pending').addEventListener('click', () => { window.location.href = '/pending'; });
+    document.getElementById('inprocess').addEventListener('click', () => { window.location.href = '/inprocess'; });
+    document.getElementById('resolved').addEventListener('click', () => { window.location.href = '/resolved'; });
+    document.getElementById('logout').addEventListener('click', () => { window.location.href = '/'; });
+  
+     // Solve button click handler
+document.querySelectorAll(".solve-btn").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const id = btn.dataset.id;
+    const res = await fetch(`/complaint/${id}/solve_and_notify`, { method: "POST" });
+    const data = await res.json();
+    if(data.status === "success"){
+      alert("Complaint moved to Resolved & User Notified!");
+      location.reload();
+    } else {
+      alert("Error: " + data.msg);
+    }
+  });
+});
+
+
+ </script>
+</body>
+</html>
