@@ -23,7 +23,9 @@ DB_CONFIG = {
 }
 
 # ---------- SQLAlchemy Config ----------
-app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://tracknfix_user:KgOeowrthwyMP7QOEfrS7s4ftzxaRwWr@dpg-d33cg7juibrs73aglgrg-a/tracknfix"
+
+#app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
