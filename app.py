@@ -7,7 +7,8 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
-from flask import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
+
 
 # ---------- Flask App Setup ----------
 app = Flask(__name__, template_folder="templates")
