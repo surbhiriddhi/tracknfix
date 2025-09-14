@@ -7,6 +7,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
+from flask_sqlalchemy import SQLAlchemy
 
 # ---------- Flask App Setup ----------
 app = Flask(__name__, template_folder="templates")
@@ -24,6 +25,8 @@ DB_CONFIG = {
 # ---------- SQLAlchemy Config ----------
 app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
 
 def get_db_connection():
     """Return a new database connection"""
